@@ -7,7 +7,12 @@
     <Nullable>enable</Nullable>
 	  <UseWPF>true</UseWPF>
 	  <UseWindowsForms>true</UseWindowsForms>
+	  <ApplicationIcon>Resources\YandexMusicDiscordRPCLogo.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\YandexMusicDiscordRPCLogo.ico" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<FrameworkReference Update="Microsoft.Windows.SDK.NET.Ref" RuntimeFrameworkVersion="10.0.19041.18" />
