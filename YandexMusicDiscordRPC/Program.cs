@@ -2,6 +2,10 @@
 using DiscordRPC;
 using DiscordRPC.Logging;
 using Windows.Media.Control;
+using System.Windows.Forms;
+using System.Windows.Controls;
+using System.Drawing.Imaging;
+using YandexMusicDiscordRPC;
 
 async Task MainAsync()
 {
@@ -16,6 +20,9 @@ async Task MainAsync()
     rpcClient.OnPresenceUpdate += (sender, message) => Console.WriteLine($"Updated RPC!");
 
     rpcClient.Initialize();
+
+    //new Thread(TrayIcon.Run).Start();
+    _ = Task.Run(() => TrayIcon.Run());
 
     var mediaManger = new WindowsMediaController.MediaManager();
     mediaManger.OnAnyMediaPropertyChanged += (session, properties) =>
@@ -40,7 +47,7 @@ async Task MainAsync()
             },
             Buttons = new[]
             {
-                new Button()
+                new DiscordRPC.Button()
                 {
                     Label = "Open search",
                     Url = $"https://music.yandex.ru/search?text={url}"
@@ -48,7 +55,7 @@ async Task MainAsync()
             }
         });
     };
-
+    
     mediaManger.OnAnyPlaybackStateChanged += (session, playbackInfo) =>
     {
         if (!session.ControlSession.SourceAppUserModelId.Contains("Yandex.Music"))
@@ -73,11 +80,12 @@ async Task MainAsync()
     };
 
     await mediaManger.StartAsync();
-
+    
     while (mediaManger.IsStarted)
     {
         await Task.Delay(1000);
     }
+    
 }
 
 MainAsync().GetAwaiter().GetResult();
