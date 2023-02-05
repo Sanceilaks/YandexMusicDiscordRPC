@@ -29,20 +29,21 @@ async Task MainAsync()
         if (!session.ControlSession.SourceAppUserModelId.Contains("Yandex.Music"))
             return;
 
-        var url = UrlEncoder.Default.Encode($"{properties.Artist}-{properties.Title}");
+        var isPlaying = session.ControlSession.GetPlaybackInfo().PlaybackStatus.Equals(GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing);
+        var url = UrlEncoder.Default.Encode($"{properties.Artist} - {properties.Title}");
 
-        Console.WriteLine($"{session.ControlSession.SourceAppUserModelId} property update: {properties.Artist} - {properties.Title}");
+        Console.WriteLine($"{session.ControlSession.SourceAppUserModelId} property update: {properties.Artist} - {properties.Title} ({properties.AlbumTitle}) ");
 
         rpcClient.SetPresence(new RichPresence()
         {
-            Details = $"{properties.Title}",
-            State = $"{properties.Artist}",
+            Details = $"🎵 {properties.Title}",
+            State = $"👤 {properties.Artist}",
             Assets = new Assets()
             {
                 LargeImageKey = "logo",
-                LargeImageText = "Yandex.Music",
-                SmallImageKey = "playing", // Music automatically starts when track changes
-                SmallImageText = "Playing"
+                LargeImageText = $"💿 {properties.AlbumTitle}",
+                SmallImageKey = isPlaying ? "playing" : "paused",
+                SmallImageText = isPlaying ? "▶️ Playing" : "⏸️ Paused"
             },
             Buttons = new[]
             {
@@ -64,7 +65,7 @@ async Task MainAsync()
 
         Console.WriteLine($"{session.ControlSession.SourceAppUserModelId} state update: {playbackInfo.PlaybackStatus}");
 
-        rpcClient.UpdateSmallAsset(isPlaying ? "playing" : "paused", isPlaying ? "Playing" : "Paused");
+        rpcClient.UpdateSmallAsset(isPlaying ? "playing" : "paused", isPlaying ? "▶️ Playing" : "⏸️ Paused");
 
     };
 
