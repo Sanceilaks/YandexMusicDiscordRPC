@@ -1,18 +1,17 @@
-﻿using System.Text.Encodings.Web;
-using DiscordRPC;
+﻿using DiscordRPC;
 using DiscordRPC.Logging;
+using System.Text.Encodings.Web;
 using Windows.Media.Control;
-using System.Windows.Forms;
-using System.Windows.Controls;
-using System.Drawing.Imaging;
 using YandexMusicDiscordRPC;
 
 async Task MainAsync()
 {
     Console.ForegroundColor = ConsoleColor.Green;
 
-    var rpcClient = new DiscordRpcClient("1071095852359233556");
-    rpcClient.Logger = new ConsoleLogger() { Level = LogLevel.Warning };
+    var rpcClient = new DiscordRpcClient("1071095852359233556")
+    {
+        Logger = new ConsoleLogger() { Level = LogLevel.Warning }
+    };
     rpcClient.OnReady += (sender, message) =>
     {
         Console.WriteLine($"User {message.User} is ready!");
@@ -30,20 +29,21 @@ async Task MainAsync()
         if (!session.ControlSession.SourceAppUserModelId.Contains("Yandex.Music"))
             return;
 
-        var url = UrlEncoder.Default.Encode($"{properties.Artist}-{properties.Title}");
+        var isPlaying = session.ControlSession.GetPlaybackInfo().PlaybackStatus.Equals(GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing);
+        var url = UrlEncoder.Default.Encode($"{properties.Artist} - {properties.Title}");
 
-        Console.WriteLine($"{session.ControlSession.SourceAppUserModelId} property update: {properties.Artist} - {properties.Title}");
+        Console.WriteLine($"{session.ControlSession.SourceAppUserModelId} property update: {properties.Artist} - {properties.Title} ({properties.AlbumTitle}) ");
 
         rpcClient.SetPresence(new RichPresence()
         {
-            Details = $"{properties.Title}",
-            State = $"{properties.Artist}",
+            Details = $"🎵 {properties.Title}",
+            State = $"👤 {properties.Artist}",
             Assets = new Assets()
             {
                 LargeImageKey = "logo",
-                LargeImageText = "Yandex.Music",
-                SmallImageKey = "playing", // Music automatically starts when track changes
-                SmallImageText = "Playing"
+                LargeImageText = $"💿 {properties.AlbumTitle}",
+                SmallImageKey = isPlaying ? "playing" : "paused",
+                SmallImageText = isPlaying ? "▶️ Playing" : "⏸️ Paused"
             },
             Buttons = new[]
             {
@@ -55,7 +55,7 @@ async Task MainAsync()
             }
         });
     };
-    
+
     mediaManger.OnAnyPlaybackStateChanged += (session, playbackInfo) =>
     {
         if (!session.ControlSession.SourceAppUserModelId.Contains("Yandex.Music"))
@@ -65,7 +65,7 @@ async Task MainAsync()
 
         Console.WriteLine($"{session.ControlSession.SourceAppUserModelId} state update: {playbackInfo.PlaybackStatus}");
 
-        rpcClient.UpdateSmallAsset(isPlaying ? "playing" : "paused", isPlaying ? "Playing" : "Paused");
+        rpcClient.UpdateSmallAsset(isPlaying ? "playing" : "paused", isPlaying ? "▶️ Playing" : "⏸️ Paused");
 
     };
 
@@ -80,12 +80,12 @@ async Task MainAsync()
     };
 
     await mediaManger.StartAsync();
-    
+
     while (mediaManger.IsStarted)
     {
         await Task.Delay(1000);
     }
-    
+
 }
 
 MainAsync().GetAwaiter().GetResult();
