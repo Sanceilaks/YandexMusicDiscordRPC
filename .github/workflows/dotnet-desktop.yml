@@ -26,4 +26,4 @@ jobs:
         uses: actions/upload-artifact@v3.1.1
         with:
           path: 
-            HacksDownloaderWPF\bin\Release\net6.0-windows\win-x86\publish\HacksDownloaderWPF.exe
+            YandexMusicDiscordRPC\bin\Release\net6.0-windows10.0.17763.0\win-x86\publish\YandexMusicDiscordRPC.exe
