@@ -1,18 +1,17 @@
-﻿using System.Text.Encodings.Web;
-using DiscordRPC;
+﻿using DiscordRPC;
 using DiscordRPC.Logging;
+using System.Text.Encodings.Web;
 using Windows.Media.Control;
-using System.Windows.Forms;
-using System.Windows.Controls;
-using System.Drawing.Imaging;
 using YandexMusicDiscordRPC;
 
 async Task MainAsync()
 {
     Console.ForegroundColor = ConsoleColor.Green;
 
-    var rpcClient = new DiscordRpcClient("1071095852359233556");
-    rpcClient.Logger = new ConsoleLogger() { Level = LogLevel.Warning };
+    var rpcClient = new DiscordRpcClient("1071095852359233556")
+    {
+        Logger = new ConsoleLogger() { Level = LogLevel.Warning }
+    };
     rpcClient.OnReady += (sender, message) =>
     {
         Console.WriteLine($"User {message.User} is ready!");
@@ -55,7 +54,7 @@ async Task MainAsync()
             }
         });
     };
-    
+
     mediaManger.OnAnyPlaybackStateChanged += (session, playbackInfo) =>
     {
         if (!session.ControlSession.SourceAppUserModelId.Contains("Yandex.Music"))
@@ -80,12 +79,12 @@ async Task MainAsync()
     };
 
     await mediaManger.StartAsync();
-    
+
     while (mediaManger.IsStarted)
     {
         await Task.Delay(1000);
     }
-    
+
 }
 
 MainAsync().GetAwaiter().GetResult();
