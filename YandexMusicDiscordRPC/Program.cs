@@ -20,7 +20,6 @@ async Task MainAsync()
 
     rpcClient.Initialize();
 
-    //new Thread(TrayIcon.Run).Start();
     _ = Task.Run(() => TrayIcon.Run());
 
     var mediaManger = new WindowsMediaController.MediaManager();
@@ -66,7 +65,6 @@ async Task MainAsync()
         Console.WriteLine($"{session.ControlSession.SourceAppUserModelId} state update: {playbackInfo.PlaybackStatus}");
 
         rpcClient.UpdateSmallAsset(isPlaying ? "playing" : "paused", isPlaying ? "▶️ Playing" : "⏸️ Paused");
-
     };
 
     mediaManger.OnAnySessionClosed += (session) =>
@@ -85,7 +83,6 @@ async Task MainAsync()
     {
         await Task.Delay(1000);
     }
-
 }
 
 MainAsync().GetAwaiter().GetResult();
