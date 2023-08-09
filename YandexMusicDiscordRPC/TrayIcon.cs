@@ -23,6 +23,8 @@ namespace YandexMusicDiscordRPC
                 Visible = true
             };
 
+            trayIcon.MouseClick += Icon_Click;
+
             Application.Run();
         }
 
@@ -34,6 +36,11 @@ namespace YandexMusicDiscordRPC
         private static void Exit_Click(object? sender, EventArgs e)
         {
             Environment.Exit(0);
+        }
+
+        private static void Icon_Click(object? sender, MouseEventArgs e)
+        {   if(e.Button == MouseButtons.Left)
+                Cmd.Start("yandexmusic://");
         }
     }
 }
