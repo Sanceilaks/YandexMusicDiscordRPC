@@ -29,6 +29,7 @@ jobs:
             YandexMusicDiscordRPC\bin\Release\net6.0-windows10.0.17763.0\win-x86\publish\YandexMusicDiscordRPC.exe
       - name: Publish
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: "YandexMusicDiscordRPC\\bin\\Release\\net6.0-windows10.0.17763.0\\win-x86\\publish\\YandexMusicDiscordRPC.exe"
         env:
