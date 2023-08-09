@@ -27,10 +27,19 @@ jobs:
         with:
           path: 
             YandexMusicDiscordRPC\bin\Release\net6.0-windows10.0.17763.0\win-x86\publish\YandexMusicDiscordRPC.exe
-      - name: Publish
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: "YandexMusicDiscordRPC\\bin\\Release\\net6.0-windows10.0.17763.0\\win-x86\\publish\\YandexMusicDiscordRPC.exe"
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.3
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+  
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: "YandexMusicDiscordRPC\\bin\\Release\\net6.0-windows10.0.17763.0\\win-x86\\publish\\YandexMusicDiscordRPC.exe"
+          asset_name: gmod.dll
+          asset_content_type: application/octet-stream
