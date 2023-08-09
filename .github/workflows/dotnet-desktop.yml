@@ -36,6 +36,8 @@ jobs:
         uses: bruceadams/get-release@v1.2.3
         env:
           GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tag_name: "1.0"
   
       - name: Upload Release Asset
         id: upload-release-asset 
