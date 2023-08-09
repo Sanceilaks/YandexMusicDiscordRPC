@@ -44,6 +44,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: "YandexMusicDiscordRPC\\bin\\Release\\net6.0-windows10.0.17763.0\\win-x86\\publish\\YandexMusicDiscordRPC.exe"
+          asset_path: "${{github.workspace}}/YandexMusicDiscordRPC/bin/Release/net6.0-windows10.0.17763.0/win-x86/publish/YandexMusicDiscordRPC.exe"
           asset_name: YandexMusicDiscordRPC.exe
           asset_content_type: application/octet-stream
