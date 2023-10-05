@@ -1,3 +1,4 @@
+[![built with Codeium](https://codeium.com/badges/main)](https://codeium.com)
 # YandexMusicDiscordRPC
 
 YandexMusicDiscordRPC - это проект, написанный на C#, который позволяет отображать информацию о текущем треке из приложения Яндекс.Музыки в вашем статусе Discord.
