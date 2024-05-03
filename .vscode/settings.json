@@ -1,3 +1,4 @@
 {
-    "dotnet.defaultSolution": "YandexMusicDiscordRPC.sln"
+    "dotnet.defaultSolution": "YandexMusicDiscordRPC.sln",
+    "workbench.iconTheme": "kawaii-icons"
 }

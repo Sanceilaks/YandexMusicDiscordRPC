@@ -25,7 +25,8 @@ async Task MainAsync()
     var mediaManger = new WindowsMediaController.MediaManager();
     mediaManger.OnAnyMediaPropertyChanged += (session, properties) =>
     {
-        if (!session.ControlSession.SourceAppUserModelId.Contains("Yandex.Music") && !session.ControlSession.SourceAppUserModelId.Contains("Яндекс"))
+        Console.WriteLine($"{session.ControlSession.SourceAppUserModelId}");
+        if (!session.ControlSession.SourceAppUserModelId.Contains("Yandex.Music") && !session.ControlSession.SourceAppUserModelId.Contains("ru.yandex.desktop.music"))
             return;
 
         var isPlaying = session.ControlSession.GetPlaybackInfo().PlaybackStatus.Equals(GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing);
