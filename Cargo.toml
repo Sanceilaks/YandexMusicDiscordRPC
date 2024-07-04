@@ -1,0 +1,12 @@
+[package]
+name = "yandex-music-discord-rpc"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+discord-rpc-client = "0.4.0"
+image = "0.25.1"
+tokio = { version = "1.38.0", features = ["full"] }
+tray-icon = "0.14.3"
+win-gsmtc = "0.1.0"
+winit = "0.30.3"
