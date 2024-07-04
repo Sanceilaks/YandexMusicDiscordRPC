@@ -11,13 +11,7 @@
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
-			"problemMatcher": "$msCompile",
-			"options": {
-				"shell": {
-					"executable": "pwsh",
-					"args": ["-C"]
-				}
-			}
+			"problemMatcher": "$msCompile"
 		},
 		{
 			"label": "publish",
