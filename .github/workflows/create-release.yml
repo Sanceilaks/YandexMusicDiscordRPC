@@ -16,4 +16,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           zip: windows
-          bin: recycle-tray-rs
+          bin: yandex-music-discord-rpc
