@@ -1,4 +1,3 @@
-use std::sync::{mpsc::Receiver, LazyLock, Mutex};
 
 use discord_rich_presence::{activity::{Activity, Assets}, DiscordIpc, DiscordIpcClient};
 
@@ -11,9 +10,9 @@ pub enum State {
     Paused,
 }
 
-impl Into<State> for PlaybackStatus {
-    fn into(self) -> State {
-        match self {
+impl From<PlaybackStatus> for State {
+    fn from(val: PlaybackStatus) -> Self {
+        match val {
             PlaybackStatus::Playing => State::Playing,
             _ => State::Paused,
         }

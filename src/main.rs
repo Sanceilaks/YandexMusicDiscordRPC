@@ -4,7 +4,7 @@ use std::sync::Arc;
 use gsmtc::{
     ManagerEvent::*,
     SessionModel,
-    SessionUpdateEvent::{self, *},
+    SessionUpdateEvent::{*},
 };
 use rpc::YandexMusicStateBuilder;
 
