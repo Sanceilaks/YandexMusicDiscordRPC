@@ -1,5 +1,6 @@
 ﻿using DiscordRPC;
 using DiscordRPC.Logging;
+using System.IO;
 using System.Text.Encodings.Web;
 using Windows.Media.Control;
 using YandexMusicDiscordRPC;
@@ -50,7 +51,7 @@ async Task MainAsync()
                 new DiscordRPC.Button()
                 {
                     Label = "Open search",
-                    Url = $"https://music.yandex.ru/search?text={url}"
+                    Url = $"https://music.yandex/search?text={url}"
                 }
             }
         });
