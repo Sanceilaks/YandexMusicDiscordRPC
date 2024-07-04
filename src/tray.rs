@@ -1,9 +1,8 @@
-use std::{os::windows::process, process::exit, sync::mpsc::Receiver, thread};
+use std::process::exit;
 
 use tray_icon::{Icon, TrayIcon, TrayIconBuilder};
 use winit::{
-    event_loop, platform::windows::{EventLoopBuilderExtWindows, WindowAttributesExtWindows}, raw_window_handle::{HasWindowHandle, RawWindowHandle, Win32WindowHandle, WindowHandle},
-    window::Window,
+    event_loop, platform::windows::EventLoopBuilderExtWindows,
 };
 
 fn get_icon() -> Icon {
