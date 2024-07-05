@@ -25,7 +25,9 @@ pub struct YandexMusicState {
     pub artist: String,
     pub album: String,
     pub state: State,
+    pub image_url: String
 }
+
 
 pub struct YandexMusicStateBuilder {
     state: YandexMusicState,
@@ -39,6 +41,7 @@ impl YandexMusicStateBuilder {
                 artist: String::new(),
                 album: String::new(),
                 state: State::Paused,
+                image_url: String::new(),
             },
         }
     }
@@ -63,6 +66,11 @@ impl YandexMusicStateBuilder {
         self
     }
 
+    pub fn image_url(mut self, image_url: String) -> Self {
+        self.state.image_url = image_url;
+        self
+    }
+
     pub fn build(self) -> YandexMusicState {
         self.state
     }
@@ -79,6 +87,7 @@ impl RPC {
             artist,
             album,
             state,
+            image_url
         } = state;
 
         self.client
@@ -87,7 +96,7 @@ impl RPC {
                     .state(&format!("👤 {artist}"))
                     .assets(
                         Assets::new()
-                            .large_image("logo")
+                            .large_image(&image_url)
                             .large_text(&format!("💿 {album}"))
                             .small_image(match state {
                                 State::Playing => "playing",
@@ -120,6 +129,10 @@ pub async fn init() -> tokio::sync::mpsc::Sender<YandexMusicState> {
         while let Some(evt) = rx.recv().await {
             rpc.set_state(evt);
         }
+
+        rpc.client.close().unwrap();
+
+        println!("Disconnected");
     });
 
     tx
