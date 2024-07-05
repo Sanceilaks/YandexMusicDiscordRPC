@@ -85,32 +85,30 @@ async fn main() {
                                 source,
                             } = model;
 
-                            if playback.is_some() && media.is_some() {
-                                if TARGET_SOURCES.contains(&source.as_str()) {
-                                    let media = media.unwrap();
+                            if playback.is_some() && media.is_some() && TARGET_SOURCES.contains(&source.as_str()) {
+                                let media = media.unwrap();
 
-                                    state_sender
-                                        .send(
-                                            YandexMusicStateBuilder::new()
-                                                .state(playback.unwrap().status.into())
-                                                .album(
-                                                    media
-                                                        .album
-                                                        .map(|x| x.title)
-                                                        .unwrap_or("".to_string()),
-                                                )
-                                                .artist(media.artist)
-                                                .image_url(
-                                                    img.as_ref()
-                                                        .unwrap_or(&"logo".to_string())
-                                                        .clone(),
-                                                )
-                                                .track(media.title)
-                                                .build(),
-                                        )
-                                        .await
-                                        .unwrap();
-                                }
+                                state_sender
+                                    .send(
+                                        YandexMusicStateBuilder::new()
+                                            .state(playback.unwrap().status.into())
+                                            .album(
+                                                media
+                                                    .album
+                                                    .map(|x| x.title)
+                                                    .unwrap_or("".to_string()),
+                                            )
+                                            .artist(media.artist)
+                                            .image_url(
+                                                img.as_ref()
+                                                    .unwrap_or(&"logo".to_string())
+                                                    .clone(),
+                                            )
+                                            .track(media.title)
+                                            .build(),
+                                    )
+                                    .await
+                                    .unwrap();
                             }
                         }
                     }
