@@ -6,7 +6,7 @@ use discord_rich_presence::{
 use dotenv_codegen::dotenv;
 use gsmtc::PlaybackStatus;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum State {
     Playing,
     Paused,
