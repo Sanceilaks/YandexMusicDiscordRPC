@@ -63,17 +63,7 @@ async fn main() {
                             }
 
                             current_song = Some((media.title.clone(), media.artist.clone()));
-
-                            if rpc::get_last_state()
-                                .await
-                                .map(|x| {
-                                    x.track.eq(&media.title)
-                                })
-                                .unwrap_or(false)
-                            {
-                                continue;
-                            }
-
+                            
                             let mut img: Option<String> = None;
 
                             trace!("Media update: {:?}", source);

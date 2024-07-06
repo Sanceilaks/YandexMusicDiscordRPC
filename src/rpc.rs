@@ -1,5 +1,3 @@
-use std::sync::LazyLock;
-
 use discord_rich_presence::{
     activity::{Activity, Assets},
     DiscordIpc, DiscordIpcClient,
@@ -7,7 +5,6 @@ use discord_rich_presence::{
 
 use dotenv_codegen::dotenv;
 use gsmtc::PlaybackStatus;
-use tokio::sync::Mutex;
 
 #[derive(Clone, Copy)]
 pub enum State {
@@ -120,12 +117,6 @@ impl RPC {
     }
 }
 
-static LAST_STATE: LazyLock<Mutex<Option<YandexMusicState>>> = LazyLock::new(|| Mutex::new(None));
-
-#[allow(dead_code)]
-pub async fn get_last_state() -> Option<YandexMusicState> {
-    LAST_STATE.lock().await.clone()
-}
 
 pub async fn init() -> tokio::sync::mpsc::Sender<YandexMusicState> {
     let (tx, mut rx) = tokio::sync::mpsc::channel::<YandexMusicState>(10);
@@ -145,7 +136,6 @@ pub async fn init() -> tokio::sync::mpsc::Sender<YandexMusicState> {
         info!("Connected");
 
         while let Some(evt) = rx.recv().await {
-            *LAST_STATE.lock().await = Some(evt.clone());
             rpc.set_state(evt);
         }
 
