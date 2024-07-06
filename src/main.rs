@@ -129,7 +129,7 @@ async fn main() {
                                 source,
                             } = model;
 
-                            if TARGET_SOURCES.iter().any(|x| source.contains(x)) {
+                            if playback.is_some() && TARGET_SOURCES.iter().any(|x| source.contains(x)) {
                                 let is_playing = playback
                                     .as_ref()
                                     .unwrap()
