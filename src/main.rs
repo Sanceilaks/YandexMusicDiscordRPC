@@ -109,7 +109,7 @@ async fn main() {
                                         .track(media.title)
                                         .image_url(
                                             img.as_ref()
-                                                .unwrap_or(&"https://pic.re/image".to_string())
+                                                .unwrap_or(&"logo".to_string())
                                                 .clone(),
                                         )
                                         .build(),
