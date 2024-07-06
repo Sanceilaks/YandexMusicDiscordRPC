@@ -2,6 +2,9 @@
 name = "yandex-music-discord-rpc"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["voidptr_t", "Vazgen005", "olejka"]
+exclude = [".gitignore", ".github/", "README.md"]
 
 [dependencies]
 discord-rich-presence = "0.2.4"
