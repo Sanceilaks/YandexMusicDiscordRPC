@@ -58,8 +58,6 @@ pub fn start() -> tokio::task::JoinHandle<()> {
                 }
             }
         }).unwrap();
-
-        
     });
 
     thread

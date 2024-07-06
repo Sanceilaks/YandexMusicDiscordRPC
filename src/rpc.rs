@@ -1,8 +1,13 @@
+use std::sync::LazyLock;
 
-use discord_rich_presence::{activity::{Activity, Assets}, DiscordIpc, DiscordIpcClient};
+use discord_rich_presence::{
+    activity::{Activity, Assets},
+    DiscordIpc, DiscordIpcClient,
+};
 
 use dotenv_codegen::dotenv;
 use gsmtc::PlaybackStatus;
+use tokio::sync::Mutex;
 
 #[derive(Clone, Copy)]
 pub enum State {
@@ -25,9 +30,8 @@ pub struct YandexMusicState {
     pub artist: String,
     pub album: String,
     pub state: State,
-    pub image_url: String
+    pub image_url: String,
 }
-
 
 pub struct YandexMusicStateBuilder {
     state: YandexMusicState,
@@ -87,17 +91,21 @@ impl RPC {
             artist,
             album,
             state,
-            image_url
+            image_url,
         } = state;
 
         self.client
-            .set_activity( Activity::new()
-                .details(&format!("🎵 {track}"))
+            .set_activity(
+                Activity::new()
+                    .details(&format!("🎵 {track}"))
                     .state(&format!("👤 {artist}"))
                     .assets(
                         Assets::new()
                             .large_image(&image_url)
-                            .large_text(&format!("💿 {album}"))
+                            .large_text(&format!(
+                                "💿 {}",
+                                album.is_empty().then_some(track.clone()).unwrap_or(album)
+                            ))
                             .small_image(match state {
                                 State::Playing => "playing",
                                 State::Paused => "paused",
@@ -105,11 +113,18 @@ impl RPC {
                             .small_text(match state {
                                 State::Playing => "▶️ Playing",
                                 State::Paused => "⏸️ Paused",
-                            })
-                    )
-                )
+                            }),
+                    ),
+            )
             .unwrap();
     }
+}
+
+static LAST_STATE: LazyLock<Mutex<Option<YandexMusicState>>> = LazyLock::new(|| Mutex::new(None));
+
+#[allow(dead_code)]
+pub async fn get_last_state() -> Option<YandexMusicState> {
+    LAST_STATE.lock().await.clone()
 }
 
 pub async fn init() -> tokio::sync::mpsc::Sender<YandexMusicState> {
@@ -120,19 +135,23 @@ pub async fn init() -> tokio::sync::mpsc::Sender<YandexMusicState> {
             client: DiscordIpcClient::new(dotenv!("CLIENT_ID")).unwrap(),
         };
 
-        println!("Client ID: {}", dotenv!("CLIENT_ID"));
+        info!("Client ID: {}", dotenv!("CLIENT_ID"));
 
-        rpc.client.connect().unwrap();
+        while let Err(err) = rpc.client.connect().map_err(|x| x.to_string()) {
+            error!("Failed to connect: {err}");
+            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+        }
 
-        println!("Connected");
+        info!("Connected");
 
         while let Some(evt) = rx.recv().await {
+            *LAST_STATE.lock().await = Some(evt.clone());
             rpc.set_state(evt);
         }
 
         rpc.client.close().unwrap();
 
-        println!("Disconnected");
+        info!("Disconnected");
     });
 
     tx
