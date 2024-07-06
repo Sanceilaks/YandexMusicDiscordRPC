@@ -42,74 +42,71 @@ async fn main() {
                 let mut current_song: Option<(String, String)> = None;
 
                 while let Some(evt) = rx.recv().await {
-                    match evt {
-                        Media(model, _) => {
-                            let SessionModel {
-                                playback,
-                                timeline: _,
-                                media,
-                                source,
-                            } = model;
+                    if let Media(model, _) = evt {
+                        let SessionModel {
+                            playback,
+                            timeline: _,
+                            media,
+                            source,
+                        } = model;
 
-                            if TARGET_SOURCES.iter().any(|x| source.contains(x)) {
-                                let media = media.unwrap();
-                                if media.title.is_empty() || media.artist.is_empty() {
-                                    continue;
-                                }
-
-                                if let Some((track, artist)) = current_song.to_owned() {
-                                    if media.title.eq(&track) && media.artist.eq(&artist) {
-                                        continue;
-                                    }
-                                }
-
-                                current_song = Some((media.title.clone(), media.artist.clone()));
-
-                                if rpc::get_last_state()
-                                    .await
-                                    .map(|x| {
-                                        x.track.eq(&media.title)
-                                    })
-                                    .unwrap_or(false)
-                                {
-                                    continue;
-                                }
-
-                                let mut img: Option<String> = None;
-
-                                trace!("Media update: {:?}", source);
-
-                                let track =
-                                    ymapi::search(&media.title, &media.artist).await.unwrap();
-                                if let Some(track) = track {
-                                    img = Some(track.get_thumbnail());
-                                    trace!("Got image: {}", img.as_ref().unwrap());
-                                }
-
-                                state_sender
-                                    .send(
-                                        YandexMusicStateBuilder::new()
-                                            .state(playback.unwrap().status.into())
-                                            .album(
-                                                media
-                                                    .album
-                                                    .map(|x| x.title)
-                                                    .unwrap_or("".to_string()),
-                                            )
-                                            .artist(media.artist)
-                                            .track(media.title)
-                                            .image_url(
-                                                img.as_ref()
-                                                    .unwrap_or(&"https://pic.re/image".to_string())
-                                                    .clone(),
-                                            )
-                                            .build(),
-                                    )
-                                    .await
-                                    .unwrap();
+                        if TARGET_SOURCES.iter().any(|x| source.contains(x)) {
+                            let media = media.unwrap();
+                            if media.title.is_empty() || media.artist.is_empty() {
+                                continue;
                             }
+
+                            if let Some((track, artist)) = current_song.to_owned() {
+                                if media.title.eq(&track) && media.artist.eq(&artist) {
+                                    continue;
+                                }
+                            }
+
+                            current_song = Some((media.title.clone(), media.artist.clone()));
+
+                            if rpc::get_last_state()
+                                .await
+                                .map(|x| {
+                                    x.track.eq(&media.title)
+                                })
+                                .unwrap_or(false)
+                            {
+                                continue;
+                            }
+
+                            let mut img: Option<String> = None;
+
+                            trace!("Media update: {:?}", source);
+
+                            let track =
+                                ymapi::search(&media.title, &media.artist).await.unwrap();
+                            if let Some(track) = track {
+                                img = Some(track.get_thumbnail());
+                                trace!("Got image: {}", img.as_ref().unwrap());
+                            }
+
+                            state_sender
+                                .send(
+                                    YandexMusicStateBuilder::new()
+                                        .state(playback.unwrap().status.into())
+                                        .album(
+                                            media
+                                                .album
+                                                .map(|x| x.title)
+                                                .unwrap_or("".to_string()),
+                                        )
+                                        .artist(media.artist)
+                                        .track(media.title)
+                                        .image_url(
+                                            img.as_ref()
+                                                .unwrap_or(&"https://pic.re/image".to_string())
+                                                .clone(),
+                                        )
+                                        .build(),
+                                )
+                                .await
+                                .unwrap();
                         }
-                        _ => {}
                     }
                 }
             });

@@ -104,7 +104,7 @@ impl RPC {
                             .large_image(&image_url)
                             .large_text(&format!(
                                 "💿 {}",
-                                album.is_empty().then_some(track.clone()).unwrap_or(album)
+                                if album.is_empty() { track.clone() } else { album }
                             ))
                             .small_image(match state {
                                 State::Playing => "playing",
