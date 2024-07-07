@@ -6,7 +6,7 @@ use winit::{
 };
 
 fn get_icon() -> Icon {
-    Icon::from_resource(1, None).unwrap()
+    Icon::from_resource(32512, None).unwrap()
 }
 
 fn create_tray_menu() -> tray_icon::menu::Menu {
