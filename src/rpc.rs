@@ -144,16 +144,14 @@ impl RPC {
             .unwrap();
     }
 
-	pub fn clear(&mut self) {
-		self.client
-			.clear_activity()
-			.unwrap();
-	}
+    pub fn clear(&mut self) {
+        self.client.clear_activity().unwrap();
+    }
 }
 
 pub enum RpcEvent {
     Update(YandexMusicState),
-    Clear
+    Clear,
 }
 
 pub async fn init() -> tokio::sync::mpsc::Sender<RpcEvent> {
@@ -176,7 +174,7 @@ pub async fn init() -> tokio::sync::mpsc::Sender<RpcEvent> {
         while let Some(evt) = rx.recv().await {
             match evt {
                 RpcEvent::Update(evt) => rpc.set_state(evt),
-                RpcEvent::Clear => rpc.clear()
+                RpcEvent::Clear => rpc.clear(),
             }
         }
 

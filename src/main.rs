@@ -41,17 +41,17 @@ async fn main() {
 
     let mut rx = gsmtc::SessionManager::create().await.unwrap();
 
-	let mut sessions = Vec::new();
+    let mut sessions = Vec::new();
 
     while let Some(evt) = rx.recv().await {
-		if let SessionRemoved { session_id } = evt {
-			sessions.retain(|&x| x != session_id);
-			trace!("Removed session: {session_id} {sessions:?}");
+        if let SessionRemoved { session_id } = evt {
+            sessions.retain(|&x| x != session_id);
+            trace!("Removed session: {session_id} {sessions:?}");
 
-			if sessions.is_empty() {
-				state_sender.send(rpc::RpcEvent::Clear).await.unwrap();
-			}
-		}
+            if sessions.is_empty() {
+                state_sender.send(rpc::RpcEvent::Clear).await.unwrap();
+            }
+        }
         if let SessionCreated {
             session_id,
             mut rx,
@@ -62,9 +62,9 @@ async fn main() {
             let state_sender = state_sender.clone();
             let track_cache = track_cache.clone();
 
-			if TARGET_SOURCES.iter().any(|x| source.contains(x)) {
-				sessions.push(session_id);
-			}
+            if TARGET_SOURCES.iter().any(|x| source.contains(x)) {
+                sessions.push(session_id);
+            }
 
             tokio::spawn(async move {
                 let mut current_state: Option<YandexMusicState> = None;
@@ -164,7 +164,10 @@ async fn main() {
                                             State::Paused
                                         };
 
-                                        state_sender.send(rpc::RpcEvent::Update(state.clone())).await.unwrap();
+                                        state_sender
+                                            .send(rpc::RpcEvent::Update(state.clone()))
+                                            .await
+                                            .unwrap();
                                     }
                                 }
                             }
