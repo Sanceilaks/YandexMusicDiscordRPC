@@ -56,7 +56,7 @@ impl TrackCache {
 
             let entity = CacheEntity {
                 thumbnail_uri: url.to_string(),
-                album_id: track.albums.get(0).map(|x| x.id).unwrap_or(0),
+                album_id: track.albums.first().map(|x| x.id).unwrap_or(0),
                 track_id: track.id,
             };
 
