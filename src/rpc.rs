@@ -143,10 +143,21 @@ impl RPC {
             )
             .unwrap();
     }
+
+	pub fn clear(&mut self) {
+		self.client
+			.clear_activity()
+			.unwrap();
+	}
 }
 
-pub async fn init() -> tokio::sync::mpsc::Sender<YandexMusicState> {
-    let (tx, mut rx) = tokio::sync::mpsc::channel::<YandexMusicState>(10);
+pub enum RpcEvent {
+    Update(YandexMusicState),
+    Clear
+}
+
+pub async fn init() -> tokio::sync::mpsc::Sender<RpcEvent> {
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<RpcEvent>(10);
 
     tokio::spawn(async move {
         let mut rpc = RPC {
@@ -163,7 +174,10 @@ pub async fn init() -> tokio::sync::mpsc::Sender<YandexMusicState> {
         info!("Connected");
 
         while let Some(evt) = rx.recv().await {
-            rpc.set_state(evt);
+            match evt {
+                RpcEvent::Update(evt) => rpc.set_state(evt),
+                RpcEvent::Clear => rpc.clear()
+            }
         }
 
         rpc.client.close().unwrap();
