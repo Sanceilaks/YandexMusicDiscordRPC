@@ -100,7 +100,7 @@ pub async fn create_client() -> Result<Client, reqwest::Error> {
 
 pub async fn search(
     title: &String,
-    artist: &String,
+    artist: &str,
 ) -> Result<Option<Track>, Box<dyn std::error::Error>> {
     let url = Url::parse_with_params(
         BASE_URL,

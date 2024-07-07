@@ -77,6 +77,7 @@ impl YandexMusicStateBuilder {
     }
 }
 
+#[allow(clippy::upper_case_acronyms)]
 pub struct RPC {
     client: DiscordIpcClient,
 }
