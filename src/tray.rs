@@ -6,10 +6,7 @@ use winit::{
 };
 
 fn get_icon() -> Icon {
-    let bytes = include_bytes!("icon.png");
-    let image = image::load_from_memory(bytes).unwrap();
-    let rgba = image.as_rgba8().unwrap();
-    Icon::from_rgba(rgba.to_vec(), image.width(), image.height()).unwrap()
+    Icon::from_resource(1, None).unwrap()
 }
 
 fn create_tray_menu() -> tray_icon::menu::Menu {
