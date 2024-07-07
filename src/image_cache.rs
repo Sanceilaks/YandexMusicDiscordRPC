@@ -11,7 +11,7 @@ struct Request {
 }
 
 pub struct ImageCache {
-    cache: HashMap<Request, Url>,
+    cache: HashMap<Request, Option<Url>>,
 }
 
 impl ImageCache {
@@ -25,18 +25,29 @@ impl ImageCache {
         let request = Request { title: title.clone(), artist: artist.clone() };
 
         if let Some(url) = self.cache.get(&request) {
-            return Ok(Some(url.clone()));
+            return Ok(url.clone());
         }
 
-        let result = ymapi::search(&title, &artist).await?;
+        let result = ymapi::search(&title, &artist).await.inspect_err(|err| {
+            error!("Failed to search: {err}");
+        });
+
+        let result = if result.is_err() {
+            None
+        } else {
+            result.unwrap()
+        };
+
+        trace!("Search result: {result:?}");
 
         if let Some(track) = result {
             let url = track.get_thumbnail();
             let url = Url::parse(&url)?;
 
-            self.cache.insert(request, url.clone());
+            self.cache.insert(request, Some(url.clone()));
             Ok(Some(url))
         } else {
+            self.cache.insert(request, None);
             Ok(None)
         }
     }

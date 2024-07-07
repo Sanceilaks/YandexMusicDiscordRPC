@@ -20,16 +20,15 @@ extern crate log;
 async fn main() {
     #[cfg(not(debug_assertions))]
     {
-        use winapi::um::wincon::{AttachConsole, ATTACH_PARENT_PROCESS};
-        unsafe {
-            AttachConsole(ATTACH_PARENT_PROCESS);
+        let args: Vec<String> = env::args().collect();
+        if args.contains(&"--debug".to_string()) {
+            unsafe {
+                use winapi::um::consoleapi::AllocConsole;
+                AllocConsole();
+            };
         }
     }
 
-
-    env::set_var("RUST_LOG", "info");
-
-    #[cfg(debug_assertions)]
     env::set_var("RUST_LOG", "trace");
 
     env_logger::init();
@@ -66,6 +65,7 @@ async fn main() {
                             } = model;
 
                             if TARGET_SOURCES.iter().any(|x| source.contains(x)) {
+                                trace!("Media update: {:?}", source);
                                 let media = media.unwrap();
                                 let is_playing = playback
                                     .as_ref()
@@ -88,8 +88,6 @@ async fn main() {
 
                                 let mut img: Option<String> = None;
 
-                                trace!("Media update: {:?}", source);
-
                                 if let Ok(image) = image_cache
                                     .lock()
                                     .await
@@ -108,9 +106,7 @@ async fn main() {
                                         .artist(media.artist)
                                         .track(media.title)
                                         .image_url(
-                                            img.as_ref()
-                                                .unwrap_or(&"logo".to_string())
-                                                .clone(),
+                                            img.as_ref().unwrap_or(&"logo".to_string()).clone(),
                                         )
                                         .build(),
                                 );
@@ -122,6 +118,8 @@ async fn main() {
                             }
                         }
                         Model(model) => {
+                            trace!("Model update: {:?}", source);
+
                             let SessionModel {
                                 playback,
                                 timeline: _,
@@ -129,7 +127,9 @@ async fn main() {
                                 source,
                             } = model;
 
-                            if playback.is_some() && TARGET_SOURCES.iter().any(|x| source.contains(x)) {
+                            if playback.is_some()
+                                && TARGET_SOURCES.iter().any(|x| source.contains(x))
+                            {
                                 let is_playing = playback
                                     .as_ref()
                                     .unwrap()
