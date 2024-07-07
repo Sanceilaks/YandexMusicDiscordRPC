@@ -32,11 +32,7 @@ impl ImageCache {
             error!("Failed to search: {err}");
         });
 
-        let result = if let Ok(result) = result {
-            result
-        } else {
-            None
-        };
+        let result = result.unwrap_or_default();
         
         trace!("Search result: {result:?}");
 
