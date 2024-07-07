@@ -6,8 +6,8 @@ use gsmtc::{ManagerEvent::*, SessionModel, SessionUpdateEvent::*};
 use rpc::{State, YandexMusicState, YandexMusicStateBuilder};
 use tokio::sync::Mutex;
 
-mod image_cache;
 mod rpc;
+mod track_cache;
 mod tray;
 mod ymapi;
 
@@ -33,7 +33,7 @@ async fn main() {
 
     env_logger::init();
 
-    let image_cache = Arc::new(Mutex::new(image_cache::ImageCache::new()));
+    let track_cache = Arc::new(Mutex::new(track_cache::TrackCache::new()));
 
     let state_sender = Arc::new(rpc::init().await);
 
@@ -50,7 +50,7 @@ async fn main() {
         {
             trace!("Created session: {{id={session_id}, source={source}}}");
             let state_sender = state_sender.clone();
-            let image_cache = image_cache.clone();
+            let track_cache = track_cache.clone();
             tokio::spawn(async move {
                 let mut current_state: Option<YandexMusicState> = None;
 
@@ -87,14 +87,18 @@ async fn main() {
                                 }
 
                                 let mut img: Option<String> = None;
+                                let mut track_id: Option<usize> = None;
+                                let mut album_id: Option<usize> = None;
 
-                                if let Ok(image) = image_cache
+                                if let Ok(track) = track_cache
                                     .lock()
                                     .await
                                     .get(media.title.clone(), media.artist.clone())
                                     .await
                                 {
-                                    img = image.map(|x| x.to_string());
+                                    img = track.as_ref().map(|x| x.thumbnail_uri.to_string());
+                                    track_id = track.as_ref().map(|x| x.track_id);
+                                    album_id = track.as_ref().map(|x| x.album_id);
                                 }
 
                                 current_state = Some(
@@ -102,9 +106,10 @@ async fn main() {
                                         .state(playback.unwrap().status.into())
                                         .album(
                                             media.album.map(|x| x.title).unwrap_or("".to_string()),
+                                            album_id.unwrap_or(0),
                                         )
                                         .artist(media.artist)
-                                        .track(media.title)
+                                        .track(media.title, track_id.unwrap_or(0))
                                         .image_url(
                                             img.as_ref().unwrap_or(&"logo".to_string()).clone(),
                                         )

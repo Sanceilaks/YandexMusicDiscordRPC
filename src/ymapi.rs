@@ -6,15 +6,22 @@ const BASE_URL: &str = " https://api.music.yandex.net/search";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Artist {
-    id: usize,
-    name: String,
+    pub id: usize,
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Album {
+    pub id: usize,
+    pub title: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Track {
-    id: usize,
-    title: String,
-    artists: Vec<Artist>,
+    pub id: usize,
+    pub title: String,
+    pub artists: Vec<Artist>,
+    pub albums: Vec<Album>,
 
     #[serde(rename = "coverUri")]
     cover_uri: String,

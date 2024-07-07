@@ -1,10 +1,11 @@
 use discord_rich_presence::{
-    activity::{Activity, Assets},
+    activity::{Activity, Assets, Button},
     DiscordIpc, DiscordIpcClient,
 };
 
 use dotenv_codegen::dotenv;
 use gsmtc::PlaybackStatus;
+use reqwest::Url;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum State {
@@ -24,8 +25,10 @@ impl From<PlaybackStatus> for State {
 #[derive(Clone)]
 pub struct YandexMusicState {
     pub track: String,
+    pub track_id: usize,
     pub artist: String,
     pub album: String,
+    pub album_id: usize,
     pub state: State,
     pub image_url: String,
 }
@@ -39,16 +42,19 @@ impl YandexMusicStateBuilder {
         Self {
             state: YandexMusicState {
                 track: String::new(),
+                track_id: 0,
                 artist: String::new(),
                 album: String::new(),
+                album_id: 0,
                 state: State::Paused,
                 image_url: String::new(),
             },
         }
     }
 
-    pub fn track(mut self, track: String) -> Self {
+    pub fn track(mut self, track: String, track_id: usize) -> Self {
         self.state.track = track;
+        self.state.track_id = track_id;
         self
     }
 
@@ -57,8 +63,9 @@ impl YandexMusicStateBuilder {
         self
     }
 
-    pub fn album(mut self, album: String) -> Self {
+    pub fn album(mut self, album: String, album_id: usize) -> Self {
         self.state.album = album;
+        self.state.album_id = album_id;
         self
     }
 
@@ -86,11 +93,22 @@ impl RPC {
     pub fn set_state(&mut self, state: YandexMusicState) {
         let YandexMusicState {
             track,
+            track_id,
             artist,
             album,
+            album_id,
             state,
             image_url,
         } = state;
+
+        let track_url = Url::parse(&format!(
+            "https://music.yandex/album/{album_id}/track/{track_id}"
+        ))
+        .unwrap();
+        let track_search_url = Url::parse(&format!(
+            "https://music.yandex/search?text={artist} - {track}"
+        ))
+        .unwrap();
 
         self.client
             .set_activity(
@@ -102,7 +120,11 @@ impl RPC {
                             .large_image(&image_url)
                             .large_text(&format!(
                                 "💿 {}",
-                                if album.is_empty() { track.clone() } else { album }
+                                if album.is_empty() {
+                                    track.clone()
+                                } else {
+                                    album
+                                }
                             ))
                             .small_image(match state {
                                 State::Playing => "playing",
@@ -112,12 +134,16 @@ impl RPC {
                                 State::Playing => "▶️ Playing",
                                 State::Paused => "⏸️ Paused",
                             }),
-                    ),
+                    )
+                    .buttons(vec![if track_id != 0 && album_id != 0 {
+                        Button::new("🔗 Open URL", track_url.as_str())
+                    } else {
+                        Button::new("🔎 Open search", track_search_url.as_str())
+                    }]),
             )
             .unwrap();
     }
 }
-
 
 pub async fn init() -> tokio::sync::mpsc::Sender<YandexMusicState> {
     let (tx, mut rx) = tokio::sync::mpsc::channel::<YandexMusicState>(10);
